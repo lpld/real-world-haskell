@@ -53,3 +53,21 @@ treeHeight :: Tree a -> Int
 treeHeight Empty = 0
 treeHeight (Node _ left right) = max (treeHeight left) (treeHeight right) + 1
 
+-- 9, 10. Write a function that calculates the turn made by two dimensial points
+-- and returns a Direction.
+data Direction = DRight 
+               | DLeft
+               | DStraight
+               deriving (Eq, Show)
+
+data Point2D = Point2D Double Double
+        deriving (Eq, Show)
+
+calcDirection :: Point2D -> Point2D -> Direction
+calcDirection (Point2D x1 y1) (Point2D x2 y2) = 
+       doCalc (x1 * y2 - x2 * y1) where 
+                doCalc d 
+                  | d < 0 = DRight
+                  | d > 0 = DLeft 
+                  | d == 0 = DStraight
+
