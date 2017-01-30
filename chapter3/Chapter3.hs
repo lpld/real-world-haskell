@@ -23,6 +23,7 @@ listReverse xs = doReverse xs []
         where doReverse [] result = result
               doReverse (x:xs) result = doReverse xs (x:result)
 
+
 -- 5. Write a function that determines whether its input list is a palindrome.
 isPalindrome :: [Int] -> Bool
 isPalindrome xs = listsEqual xs (listReverse xs)
@@ -36,4 +37,19 @@ sortByLength :: [[a]] -> [[a]]
 sortByLength xs = sortBy compareByLength xs
         where compareByLength xs ys = compare (listLength xs) (listLength ys)
 
+-- 7. Define a function that joins a list of lists together using a separator value.
+intersperse :: a -> [[a]] -> [a]
+intersperse _ [] = []
+intersperse separator (x:xs) = doJoin xs x
+        where doJoin [] result = result
+              doJoin (x:xs) result = doJoin xs (result ++ (separator : x))
+
+-- 8. Using the binary tree type that we defined earlier, write a function that 
+-- will determine the height of the tree.
+data Tree a = Node a (Tree a) (Tree a)
+            | Empty
+
+treeHeight :: Tree a -> Int
+treeHeight Empty = 0
+treeHeight (Node _ left right) = max (treeHeight left) (treeHeight right) + 1
 
