@@ -63,9 +63,11 @@ data Direction = DRight
 data Point2D = Point2D Double Double
         deriving (Eq, Show)
 
-calcDirection :: Point2D -> Point2D -> Direction
-calcDirection (Point2D x1 y1) (Point2D x2 y2) = 
-       doCalc (x1 * y2 - x2 * y1) where 
+calcDirection :: Point2D -> Point2D -> Point2D -> Direction
+calcDirection (Point2D x1 y1) (Point2D x2 y2) (Point2D x3 y3) = 
+        let (xx1, yy1) = (x2 - x1, y2 - y1) 
+            (xx2, yy2) = (x3 - x2, y3 - y2)
+         in doCalc (xx1 * yy2 - xx2 * yy1) where 
                 doCalc d 
                   | d < 0 = DRight
                   | d > 0 = DLeft 
