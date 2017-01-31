@@ -1,4 +1,5 @@
 import Data.List
+import TwoD
 
 -- 1, 2. Write a function that computes the number of elements in a list.
 listLength :: [a] -> Int
@@ -55,14 +56,6 @@ treeHeight (Node _ left right) = max (treeHeight left) (treeHeight right) + 1
 
 -- 9, 10. Write a function that calculates the turn made by two dimensial points
 -- and returns a Direction.
-data Direction = DRight 
-               | DLeft
-               | DStraight
-               deriving (Eq, Show)
-
-data Point2D = Point2D Double Double
-        deriving (Eq, Show)
-
 calcDirection :: Point2D -> Point2D -> Point2D -> Direction
 calcDirection (Point2D x1 y1) (Point2D x2 y2) (Point2D x3 y3) = 
         let (xx1, yy1) = (x2 - x1, y2 - y1) 
