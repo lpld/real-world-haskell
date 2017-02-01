@@ -4,7 +4,17 @@ import Data.List
 
 -- 12. Implement Graham's scan algorithm for the convex hull of a set of 2D points.
 convexHull :: [Point2D] -> [Point2D]
-convexHull points = points
+convexHull points = 
+        let (p1:p2:ps) = sortPoints points (initialPoint points)
+         in calculateHull ps [p1, p2]
+
+calculateHull :: [Point2D] -> [Point2D] -> [Point2D]
+calculateHull [] hull = hull
+calculateHull (p:ps) (h1:h2:hs) = 
+        if calcDirection h2 h1 p == DLeft 
+           then calculateHull ps (p:h1:h2:hs)
+           else calculateHull (p:ps) (h2:hs)
+calculateHull _ _ = error "NO!"
 
 initialPoint :: [Point2D] -> Point2D
 initialPoint ps = minimumBy compareCoords ps where
@@ -16,7 +26,11 @@ initialPoint ps = minimumBy compareCoords ps where
 
 sortPoints :: [Point2D] -> Point2D -> [Point2D]
 sortPoints points initP = sortBy compareAngles points where
-        compareAngles p1 p2 = compare (slope initP p1) (slope initP p2) 
-                where slope (Point2D x1 y1) (Point2D x2 y2) =
-                        (y2 - y1) / (x2 - x1)
+        compareAngles p1 p2
+          | p1 == initP = LT 
+          | p2 == initP = GT
+          | otherwise   = compare (slope initP p1) (slope initP p2) where 
+                  slope (Point2D x1 y1) (Point2D x2 y2) = (y2 - y1) / (x2 - x1)
+
+
 
