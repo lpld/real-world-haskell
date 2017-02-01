@@ -6,7 +6,7 @@ import Data.List
 convexHull :: [Point2D] -> [Point2D]
 convexHull points = 
         let (p1:p2:ps) = sortPoints points (initialPoint points)
-         in calculateHull ps [p1, p2]
+         in calculateHull ps [p2, p1]
 
 calculateHull :: [Point2D] -> [Point2D] -> [Point2D]
 calculateHull [] hull = hull
@@ -14,7 +14,6 @@ calculateHull (p:ps) (h1:h2:hs) =
         if calcDirection h2 h1 p == DLeft 
            then calculateHull ps (p:h1:h2:hs)
            else calculateHull (p:ps) (h2:hs)
-calculateHull _ _ = error "NO!"
 
 initialPoint :: [Point2D] -> Point2D
 initialPoint ps = minimumBy compareCoords ps where
