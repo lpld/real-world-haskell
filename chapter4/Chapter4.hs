@@ -1,4 +1,4 @@
-module Chapter3 where
+module Chapter4 where
 
 -- 1. Write your own "safe" definitions of the standard partial list functions.
 safeHead :: [a] -> Maybe a
