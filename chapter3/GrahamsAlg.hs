@@ -1,4 +1,4 @@
-module GrahamsAlg where
+module GrahamsAlg(convexHull) where
 import TwoD
 import Data.List
 
@@ -30,6 +30,4 @@ sortPoints points initP = sortBy compareAngles points where
           | p2 == initP = GT
           | otherwise   = compare (slope initP p1) (slope initP p2) where 
                   slope (Point2D x1 y1) (Point2D x2 y2) = (y2 - y1) / (x2 - x1)
-
-
 
