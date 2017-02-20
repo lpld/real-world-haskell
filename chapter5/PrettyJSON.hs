@@ -25,14 +25,14 @@ renderJValue (JBool True)  = text "true"
 renderJValue (JBool False) = text "false"
 renderJValue JNull         = text "null"
 renderJValue (JArray ary)  = renderJArray series renderJValue ary
-renderJValue (JObject o)   = renderJObject series o
+renderJValue (JObject o)   = renderJObject series renderJValue o
 
 -- RenderFunction that puts each JValue on a different line. It behaves
 -- the same way as 'renderJValue' for simple types, but it handles arrays 
 -- and objects differently.
 renderJValueLong :: RenderFunction
 renderJValueLong (JArray ary) =  renderJArray seriesLong renderJValueLong ary
-renderJValueLong (JObject obj) = renderJObject seriesLong obj
+renderJValueLong (JObject obj) = renderJObject seriesLong renderJValueLong obj
 renderJValueLong any = renderJValue any
 
 -- generic function for rendering arrays
@@ -40,11 +40,11 @@ renderJArray :: SeriesFunction JValue -> RenderFunction -> [JValue] -> Doc
 renderJArray s = s '[' ']'
 
 -- generic function for rendering objects
-renderJObject :: SeriesFunction JPair -> [JPair] -> Doc
-renderJObject s = s '{' '}' field
+renderJObject :: SeriesFunction JPair ->RenderFunction -> [JPair] -> Doc
+renderJObject s r = s '{' '}' field
     where field (name, val)  = string name
                             <> text ": "
-                            <> renderJValue val
+                            <> r val
 
 -- convert String to Doc, enclosing the value in '"'
 string :: String -> Doc
@@ -95,5 +95,5 @@ series open close item = enclose open close
 
 -- SeriesFunction that puts each JValue on a separate line
 seriesLong :: SeriesFunction a
-seriesLong open close item = encloseStr [open, '\n'] ['\n', close]
-                         . hcat . punctuate (text ",\n") . map item
+seriesLong open close item = enclose open close
+                         . longcat . punctuate (char ',') . map item

@@ -38,6 +38,10 @@ char = Char
 hcat :: [Doc] -> Doc
 hcat = fold (<>)
 
+longcat :: [Doc] -> Doc
+longcat [] = empty
+longcat ds = line <> fold (\x y -> x <> line <> y) ds
+
 fold :: (Doc -> Doc -> Doc) -> [Doc] -> Doc
 fold f = foldr f empty
 
@@ -100,6 +104,24 @@ w `fits` _ | w < 0 = False
 w `fits` ""        = True
 w `fits` ('\n':_)  = True
 w `fits` (c:cs)    = (w - 1) `fits` cs
+
+indented :: Int -> Doc -> String
+indented indSize x = transform 0 [x]
+        where transform offset (d:ds) =
+                case d of
+                  Empty -> transform offset ds
+                  Char c -> c : transform (newOffset offset c) ds
+                  Text s -> s ++ transform offset ds
+                  Line -> '\n' : replicate offset ' ' ++ transform offset ds
+                  Line `Concat` Char c -> 
+                          let nOffset = newOffset offset c in
+                              '\n' : replicate nOffset ' ' ++ [c] ++ transform nOffset ds
+                  a `Concat` b -> transform offset (a:b:ds)
+                  a `Union` b -> transform offset (a:ds)
+              transform _ _ = ""
+              newOffset offset c | c == '{' || c == '[' = offset + indSize
+                                 | c == '}' || c == ']' = offset - indSize
+                                 | otherwise            = offset
 
 -- fill :: Int -> Doc -> Doc
 -- fill w 
