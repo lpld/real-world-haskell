@@ -1,4 +1,4 @@
-module PrettyJSON (renderJValue) where
+module PrettyJSON (renderJValue, renderJValueLong) where
 
 import Prettify
 import SimpleJSON
@@ -6,9 +6,17 @@ import Numeric (showHex)
 import Data.Bits (shiftR, (.&.))
 import Data.Char (ord)
 
+-- function that combines a list of values ([a]) into a single Doc,
+-- putting commas between them and enclosing the result.
+-- Char -> Char : characters to enclose the result in
+-- (a -> Doc)   : function to convert a single 'a' into a Doc
+-- [a]          : a list of values 'a'
 type SeriesFunction a = Char -> Char -> (a -> Doc) -> [a] -> Doc
+
 type RenderFunction = JValue -> Doc
 
+-- RenderFunction that performs compact rendering, i.e. will put multiple
+-- JValues on a single line, as long as it fits their length.
 renderJValue :: RenderFunction
 
 renderJValue (JString s)   = string s
@@ -19,14 +27,19 @@ renderJValue JNull         = text "null"
 renderJValue (JArray ary)  = renderJArray series renderJValue ary
 renderJValue (JObject o)   = renderJObject series o
 
+-- RenderFunction that puts each JValue on a different line. It behaves
+-- the same way as 'renderJValue' for simple types, but it handles arrays 
+-- and objects differently.
 renderJValueLong :: RenderFunction
 renderJValueLong (JArray ary) =  renderJArray seriesLong renderJValueLong ary
 renderJValueLong (JObject obj) = renderJObject seriesLong obj
 renderJValueLong any = renderJValue any
 
+-- generic function for rendering arrays
 renderJArray :: SeriesFunction JValue -> RenderFunction -> [JValue] -> Doc
 renderJArray s = s '[' ']'
 
+-- generic function for rendering objects
 renderJObject :: SeriesFunction JPair -> [JPair] -> Doc
 renderJObject s = s '{' '}' field
     where field (name, val)  = string name
@@ -37,10 +50,11 @@ renderJObject s = s '{' '}' field
 string :: String -> Doc
 string = enclose '"' '"' . hcat . map oneChar
 
--- enclose Doc in double quotes
+-- enclose Doc in two characters
 enclose :: Char -> Char -> Doc -> Doc
 enclose left right x = char left <> x <> char right
 
+-- enclose Doc in two strings
 encloseStr :: String -> String -> Doc -> Doc
 encloseStr left right x = text left <> x <> text right
 
@@ -73,10 +87,13 @@ hexEscape c | d < 0x10000 = smallHex d
             | otherwise   = astral (d - 0x10000)
     where d = ord c
 
+-- SeriesFunction that renders values compactly, i.e. possibly
+-- putting multiple values on a single line.
 series :: SeriesFunction a
 series open close item = enclose open close 
                          . fsep . punctuate (char ',') . map item
 
+-- SeriesFunction that puts each JValue on a separate line
 seriesLong :: SeriesFunction a
 seriesLong open close item = encloseStr [open, '\n'] ['\n', close]
                          . hcat . punctuate (text ",\n") . map item
