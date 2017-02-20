@@ -1,10 +1,12 @@
 module SimpleJSON where
 
+type JPair = (String, JValue)
+
 data JValue = JString String
             | JNumber Double
             | JBool Bool
             | JNull
-            | JObject [(String, JValue)]
+            | JObject [JPair]
             | JArray [JValue]
             deriving (Eq, Ord, Show)
 

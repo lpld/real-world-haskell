@@ -32,7 +32,7 @@ x <> y     = x `Concat` y
 
 -- Char to Doc
 char :: Char -> Doc
-char c = Char c
+char = Char
 
 -- concat list of Docs into single one
 hcat :: [Doc] -> Doc
@@ -61,8 +61,8 @@ flatten (x `Union` _)  = flatten x
 flatten other          = other
 
 punctuate :: Doc -> [Doc] -> [Doc]
-punctuate p [] = []
-punctuate p [d] = [d]
+punctuate p []     = []
+punctuate p [d]    = [d]
 punctuate p (d:ds) = (d <> p) : punctuate p ds
 
 -- compact rendering function
@@ -83,10 +83,10 @@ pretty :: Int -> Doc -> String
 pretty width x = best 0 [x]
         where best col (d:ds) =
                 case d of
-                  Empty -> best col ds
-                  Char c -> c : best (col + 1) ds
-                  Text s -> s ++ best (col + length s) ds
-                  Line -> '\n' : best 0 ds
+                  Empty        -> best col ds
+                  Char c       -> c : best (col + 1) ds
+                  Text s       -> s ++ best (col + length s) ds
+                  Line         -> '\n' : best 0 ds
                   a `Concat` b -> best col (a:b:ds)
                   a `Union` b  -> nicest col (best col (a:ds))
                                              (best col (b:ds))
@@ -100,3 +100,6 @@ w `fits` _ | w < 0 = False
 w `fits` ""        = True
 w `fits` ('\n':_)  = True
 w `fits` (c:cs)    = (w - 1) `fits` cs
+
+-- fill :: Int -> Doc -> Doc
+-- fill w 
