@@ -40,7 +40,7 @@ renderJArray :: SeriesFunction JValue -> RenderFunction -> [JValue] -> Doc
 renderJArray s = s '[' ']'
 
 -- generic function for rendering objects
-renderJObject :: SeriesFunction JPair ->RenderFunction -> [JPair] -> Doc
+renderJObject :: SeriesFunction JPair -> RenderFunction -> [JPair] -> Doc
 renderJObject s r = s '{' '}' field
     where field (name, val)  = string name
                             <> text ": "

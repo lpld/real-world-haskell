@@ -106,22 +106,22 @@ w `fits` ('\n':_)  = True
 w `fits` (c:cs)    = (w - 1) `fits` cs
 
 indented :: Int -> Doc -> String
-indented indSize x = transform 0 [x]
-        where transform offset (d:ds) =
+indented indSize x = transform 0 0 [x]
+        where transform offset pendingOffset (d:ds) =
                 case d of
-                  Empty -> transform offset ds
-                  Char c -> c : transform (newOffset offset c) ds
-                  Text s -> s ++ transform offset ds
-                  Line -> '\n' : replicate offset ' ' ++ transform offset ds
-                  Line `Concat` Char c -> 
-                          let nOffset = newOffset offset c in
-                              '\n' : replicate nOffset ' ' ++ [c] ++ transform nOffset ds
-                  a `Concat` b -> transform offset (a:b:ds)
-                  a `Union` b -> transform offset (a:ds)
-              transform _ _ = ""
-              newOffset offset c | c == '{' || c == '[' = offset + indSize
-                                 | c == '}' || c == ']' = offset - indSize
-                                 | otherwise            = offset
+                  Empty -> transform offset pendingOffset ds
+                  Char c -> let offsets = recalcOffset offset pendingOffset c 
+                                offsetBefore = fst offsets
+                                offsetAfter = snd offsets
+                             in printOffset offsetBefore ++ [c] ++ transform offsetAfter 0 ds
+                  Text s -> printOffset pendingOffset ++ s ++ transform offset 0 ds
+                  Line -> '\n' : transform offset offset ds
+                  a `Concat` b -> transform offset pendingOffset (a:b:ds)
+                  a `Union` b -> transform offset 0 (a:ds)
+              transform _ _ _ = ""
+              recalcOffset current pending c
+                | c == '{' || c == '[' = (0, current + indSize)
+                | c == '}' || c == ']' = (current - indSize, current - indSize)
+                | otherwise            = (pending, current)
+              printOffset n = replicate n ' '
 
--- fill :: Int -> Doc -> Doc
--- fill w 
