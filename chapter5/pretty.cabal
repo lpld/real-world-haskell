@@ -1,0 +1,11 @@
+Name:           pretty
+Version:        0.1
+
+Synopsis:       Pretty printing library
+Cabal-Version: >= 1.2
+
+library
+  Exposed-Modules:  Prettify
+                    PrettyJSON
+                    SimpleJSON
+  Build-Depends:    base >= 2.0
